@@ -24,6 +24,15 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+
+   const studentCollection = client.db('aircncDb').collection('student')
+   const instructorCollection = client.db('aircncDb').collection('instructor')
+   const adminCollection = client.db('aircncDb').collection('admin')
+
+
+
+
+
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
