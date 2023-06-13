@@ -59,6 +59,23 @@ async function run() {
       res.send(result);
     });
 
+     //student get show mySelectedClass
+ app.post("/selectedClass", async (req, res) => {
+  const selectedClass = req.body;
+  const filter = {
+    student_email: selectedClass.student_email,
+    class_id: selectedClass.class_id,
+  };
+  const exist = await selectedClassCollection.find(filter).toArray();
+
+  if (exist.length) {
+    const message = "Already selected this class";
+    return res.send({ acknowledged: false, message });
+  }
+  const result = await selectedClassCollection.insertOne(selectedClass);
+  res.send(result);
+});
+
     console.log("Database is connected Successfull");
   } finally {
     // Ensures that the client will close when you finish/error
