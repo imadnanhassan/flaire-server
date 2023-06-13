@@ -85,6 +85,13 @@ app.get("/selectedClass/:email", async (req, res) => {
   res.send(result);
 });
 
+ //add class 
+ app.post("/addClass", async (req, res) => {
+  const AddClass = req.body;
+  const result = await allClassCollection.insertOne(AddClass);
+  res.send(result);
+});
+
     console.log("Database is connected Successfull");
   } finally {
     // Ensures that the client will close when you finish/error
