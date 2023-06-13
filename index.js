@@ -23,17 +23,19 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const userCollection = client.db("flaire").collection("user");
-    const classCollection = client.db("flaire").collection("class");
+    const allClassCollection = client.db("flaire").collection("addClass");
     const selectedClassCollection = client
       .db("flaire")
       .collection("selectedClass");
+
+    const classCollection = client.db("flaire").collection("class");
     const studentCollection = client.db("flaire").collection("student");
     const instructorCollection = client.db("flaire").collection("instructor");
     const adminCollection = client.db("flaire").collection("admin");
 
     app.get("/class", async (req, res) => {
       const filter = {};
-      const result = await classCollection.find(filter).toArray();
+      const result = await allClassCollection.find(filter).toArray();
       res.send(result);
     });
 
@@ -50,34 +52,10 @@ async function run() {
       const user = await userCollection.insertOne(userInfo);
       res.send(user);
     });
-
+    //get all user
     app.get("/user", async (req, res) => {
       const filter = {};
       const result = await userCollection.find(filter).toArray();
-      res.send(result);
-    });
-
-    //student get show mySelectedClass
-    app.post("/selectedClass", async (req, res) => {
-      const selectedClass = req.body;
-      const filter = {
-        student_email: selectedClass.student_email,
-        class_id: selectedClass.class_id,
-      };
-      const exist = await selectedClassCollection.find(filter).toArray();
-      console.log(exist);
-      if (exist.length) {
-        const message = "Already selected this class";
-        return res.send({ acknowledged: false, message });
-      }
-      const result = await selectedClassCollection.insertOne(selectedClass);
-      res.send(result);
-    });
-    app.get("/selectedClass/:email", async (req, res) => {
-      const { email } = req.params;
-      const result = await selectedClassCollection
-        .find({ student_email: email })
-        .toArray();
       res.send(result);
     });
 
