@@ -11,7 +11,6 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.eqk9iwm.mongodb.net/?retryWrites=true&w=majority`;
 
-console.log(uri);
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -25,7 +24,9 @@ async function run() {
   try {
     const userCollection = client.db("flaire").collection("user");
     const classCollection = client.db("flaire").collection("class");
-
+    const selectedClassCollection = client
+      .db("flaire")
+      .collection("selectedClass");
     const studentCollection = client.db("flaire").collection("student");
     const instructorCollection = client.db("flaire").collection("instructor");
     const adminCollection = client.db("flaire").collection("admin");
@@ -36,19 +37,19 @@ async function run() {
       res.send(result);
     });
 
-    app.post('/create_user', async (req, res) => {
+    app.post("/create_user", async (req, res) => {
       const userInfo = req.body;
       const filter = {
-          email: userInfo.email,
-      }
+        email: userInfo.email,
+      };
       const alreadyUser = await userCollection.find(filter).toArray();
       if (alreadyUser.length) {
-          const message = `Already have a user this ${userInfo.email}`
-          return res.send({ acknowledged: false, message })
+        const message = `Already have a user this ${userInfo.email}`;
+        return res.send({ acknowledged: false, message });
       }
       const user = await userCollection.insertOne(userInfo);
       res.send(user);
-  })
+    });
 
     app.get("/user", async (req, res) => {
       const filter = {};
@@ -56,13 +57,31 @@ async function run() {
       res.send(result);
     });
 
+    //student get show mySelectedClass
+    app.post("/selectedClass", async (req, res) => {
+      const selectedClass = req.body;
+      const filter = {
+        student_email: selectedClass.student_email,
+        class_id: selectedClass.class_id,
+      };
+      const exist = await selectedClassCollection.find(filter).toArray();
+      console.log(exist);
+      if (exist.length) {
+        const message = "Already selected this class";
+        return res.send({ acknowledged: false, message });
+      }
+      const result = await selectedClassCollection.insertOne(selectedClass);
+      res.send(result);
+    });
+    app.get("/selectedClass/:email", async (req, res) => {
+      const { email } = req.params;
+      const result = await selectedClassCollection
+        .find({ student_email: email })
+        .toArray();
+      res.send(result);
+    });
 
-
-    
-
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    console.log("Database is connected Successfull");
   } finally {
     // Ensures that the client will close when you finish/error
     //  await client.close();
