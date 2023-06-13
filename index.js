@@ -59,45 +59,52 @@ async function run() {
       res.send(result);
     });
 
-     //student get show mySelectedClass
- app.post("/selectedClass", async (req, res) => {
-  const selectedClass = req.body;
-  const filter = {
-    student_email: selectedClass.student_email,
-    class_id: selectedClass.class_id,
-  };
-  const exist = await selectedClassCollection.find(filter).toArray();
+    //student get show mySelectedClass
+    app.post("/selectedClass", async (req, res) => {
+      const selectedClass = req.body;
+      const filter = {
+        student_email: selectedClass.student_email,
+        class_id: selectedClass.class_id,
+      };
+      const exist = await selectedClassCollection.find(filter).toArray();
 
-  if (exist.length) {
-    const message = "Already selected this class";
-    return res.send({ acknowledged: false, message });
-  }
-  const result = await selectedClassCollection.insertOne(selectedClass);
-  res.send(result);
-});
+      if (exist.length) {
+        const message = "Already selected this class";
+        return res.send({ acknowledged: false, message });
+      }
+      const result = await selectedClassCollection.insertOne(selectedClass);
+      res.send(result);
+    });
 
-//get selected class
-app.get("/selectedClass/:email", async (req, res) => {
-  const { email } = req.params;
-  const result = await selectedClassCollection
-    .find({ student_email: email })
-    .toArray();
-  res.send(result);
-});
+    //get selected class
+    app.get("/selectedClass/:email", async (req, res) => {
+      const { email } = req.params;
+      const result = await selectedClassCollection
+        .find({ student_email: email })
+        .toArray();
+      res.send(result);
+    });
 
- //add class 
- app.post("/addClass", async (req, res) => {
-  const AddClass = req.body;
-  const result = await allClassCollection.insertOne(AddClass);
-  res.send(result);
-});
+    //add class
+    app.post("/addClass", async (req, res) => {
+      const AddClass = req.body;
+      const result = await allClassCollection.insertOne(AddClass);
+      res.send(result);
+    });
 
- //get all class
- app.get('/allClass', async(req, res)=>{
-  const filter = {};
-  const result = await allClassCollection.find(filter).toArray();
-  res.send(result);
-})
+    //get all class
+    app.get("/allClass", async (req, res) => {
+      const filter = {};
+      const result = await allClassCollection.find(filter).toArray();
+      res.send(result);
+    });
+
+    //get my class
+    app.get("/addClass/:email", async (req, res) => {
+      const { email } = req.params;
+      const result = await allClassCollection.find({ email: email }).toArray();
+      res.send(result);
+    });
 
     console.log("Database is connected Successfull");
   } finally {
