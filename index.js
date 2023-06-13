@@ -92,6 +92,13 @@ app.get("/selectedClass/:email", async (req, res) => {
   res.send(result);
 });
 
+ //get all class
+ app.get('/allClass', async(req, res)=>{
+  const filter = {};
+  const result = await allClassCollection.find(filter).toArray();
+  res.send(result);
+})
+
     console.log("Database is connected Successfull");
   } finally {
     // Ensures that the client will close when you finish/error
