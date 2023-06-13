@@ -11,7 +11,7 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.eqk9iwm.mongodb.net/?retryWrites=true&w=majority`;
 
-console.log(uri)
+console.log(uri);
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -23,18 +23,43 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    const userCollection = client.db("flaire").collection("user");
+    const classCollection = client.db("flaire").collection("class");
+
     const studentCollection = client.db("flaire").collection("student");
     const instructorCollection = client.db("flaire").collection("instructor");
     const adminCollection = client.db("flaire").collection("admin");
 
     app.get("/class", async (req, res) => {
       const filter = {};
-      const result = await studentCollection.find(filter).toArray();
+      const result = await classCollection.find(filter).toArray();
       res.send(result);
     });
 
+    app.post('/create_user', async (req, res) => {
+      const userInfo = req.body;
+      const filter = {
+          email: userInfo.email,
+      }
+      const alreadyUser = await userCollection.find(filter).toArray();
+      if (alreadyUser.length) {
+          const message = `Already have a user this ${userInfo.email}`
+          return res.send({ acknowledged: false, message })
+      }
+      const user = await userCollection.insertOne(userInfo);
+      res.send(user);
+  })
+
+    app.get("/user", async (req, res) => {
+      const filter = {};
+      const result = await userCollection.find(filter).toArray();
+      res.send(result);
+    });
+
+
+
     
-  
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
