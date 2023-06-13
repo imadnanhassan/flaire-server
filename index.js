@@ -76,6 +76,15 @@ async function run() {
   res.send(result);
 });
 
+//get selected class
+app.get("/selectedClass/:email", async (req, res) => {
+  const { email } = req.params;
+  const result = await selectedClassCollection
+    .find({ student_email: email })
+    .toArray();
+  res.send(result);
+});
+
     console.log("Database is connected Successfull");
   } finally {
     // Ensures that the client will close when you finish/error
